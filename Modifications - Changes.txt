@@ -1,0 +1,40 @@
+Changes for Next Revision
+ Polarity protection at input
+ Optional position for resistor divider at digital output (to allow 3.3V logic with 5V power source) - better than adjusting gain
+ Can commonise the two trimpot values?
+ Gain trimpot is either 100k-150k for conductive mode or 500k+ for capacitive mode - better solution? 
+ More capacitive coupling (closer spacing?)
+ Modifications as noted below
+ 
+ 
+Changes from the original Rev A sch (29/06/2024) to the revised Rev A (29/09/2024):
+ R10 change to XXk to increase hysteresis 
+ R9 change to 10k to reduce power LED brightness. This better matches the orange LED too
+ Cut track near R7 to isolate panel sense net and insert 1nF between panel sense and R7, add 100pF parallel to R7 -- filtering for 50Hz and reducing impact of capacitive coupling to improve dynamic range
+ C4 = 100nF
+
+**** DEVELOPMENT NOTES ****
+
+Remark: open circuit panel is about 60pF//20Meg+
+Tape + foil on about 1/3 coverage increases capacitance to 94pF, so not a very big change
+
+Still can't get a really good capacitve sensing result. Suggest increasing drive frequency to make it easier to couple and filter 
+
+origi osc freq, cap sense, half covered
+ 790mV -> 910mV
+ 
+Increase freq by reducing C2 to 10nF
+ 250mV -> 330mV
+ 
+No good, so C2 back to 100nF. Change R8 to 10k (was mod=33k) to increase gain
+ 1.9V-> 2.75V
+ 2.7-3.9 = 1.2
+ 2.8-4.0 = 1.2
+ 3.15-4.3 = 1.15
+ 
+Increasing C4 improves distinction between on/off states
+C4=100nF/200nF sense now 1.5V delta or even higher, so not too bad
+
+Still need gain to adjust for capsense and ressense modes, probably too much variaiton for a solder jumper
+
+HPF 10k/100pF doesnt have any real need but it should give a more robust design in the next rev

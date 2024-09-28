@@ -1,0 +1,10 @@
+Heater measurements
+
+Control votlage is 3.3V or 5V nominal. Minimum recommended is 1.8V
+Heater supply voltage is 5V maximum to avoid overloading the heating resistors (votlage at the PCB, there may be additional votlage drop)
+
+5V input = 0.4A = 2W (0.25W per resistor = 100% loading)
+3.3V input = 0.26A = 0.87W (0.11W per resistor = 44% loading)
+
+In auto-heat mode: 
+Tested that HEAT pin can control the heater regardless of the digOut state, however if HEAT pin floats then the heating is automatic. In this mode the HEAT pin also reports the DigOut state too, with a small voltage drop (approx 90% of VDD)
