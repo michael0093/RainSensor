@@ -12,7 +12,10 @@ Changes from the original Rev A sch (29/06/2024) to the revised Rev A (29/09/202
  R9 change to 10k to reduce power LED brightness. This better matches the orange LED too
  Cut track near R7 to isolate panel sense net and insert 1nF between panel sense and R7, add 100pF parallel to R7 -- filtering for 50Hz and reducing impact of capacitive coupling to improve dynamic range
  C4 = 100nF
-
+ RV2 change to Rgain=100k since this is decent for both resistive and capacitive modes
+ Add location of the anaOut scaling mod (optional)
+ Change RV1 to 100k since value is not important and 100k is better for the anaout scaling mod if desired
+ 
 **** DEVELOPMENT NOTES ****
 
 Remark: open circuit panel is about 60pF//20Meg+
@@ -38,3 +41,63 @@ C4=100nF/200nF sense now 1.5V delta or even higher, so not too bad
 Still need gain to adjust for capsense and ressense modes, probably too much variaiton for a solder jumper
 
 HPF 10k/100pF doesnt have any real need but it should give a more robust design in the next rev
+
+with Rmod1 Cmod2 filter = 2.93V
+without filter = 2.80V
+Different boards so probably not really much difference
+
+
+For resistive, quarter turn of 500k is plenty = 125k, probably 100k is fine
+For capacitive, also 100k
+
+resistive no drops = 2.1V, one drop = max 4.4V
+capacitive one drop = 2.3, two drops = 2.5, 3 drops = 2.8, 8 drops = 4.0. Smear large drop = 4.4V max
+
+Anaout ripple (open sensor) = 41mVpp with 100k in place of trimmer. Add extra 100k to GND = 84mV
+Add 100nF to gnd after a 100k trimmer = 0V ripple so long as the pots not in the full max position
+
+Replace D1 with 1k and change R5 to 10k, achieves a similar voltage (0.45V) at Vin=5V, but now scales down with supply voltage.
+At 3.3Vin (all values are before anaout scaling)
+  open cct = 0.37. Short cct = 2.69V
+  1 drop on sensor = 1.9V, 3 drops = 2.45V
+capacitive mode
+  1 drop = 0.45V, 3 drops = 0.63, many drops = 0.75
+  
+5V
+open 0.75V
+short 4.4V
+1 drop capacitive 0.9V
+3 drops capacitive 1.07V
+
+Increase teh gain, capacitive mode.
+open cct = 1.42V, many drops = 2.00
+
+Almost max gain 
+open 2.03V, many drops = 3.0V
+in resistive mode 1 drop = full 4.4V output
+
+Ok so dont change the diode, change the gain. Dont want to waste our 600mV max on the sensor.
+Retain RV2=100k, but add option for parallel 100k to make gain 50k for 3.3V operation, this gives us the margin we need again without compromising on sensor votlage. Retest:
+
+3.3Vin with RV2=50k
+open = 1.20V
+change RV2=100k, 3.3Vin open/short = 1.81V/3.29, 5Vin = 1.85V/4.41V
+
+Unity buffer is saturating when the comparator turns on. somethings not right there
+> Disconnected R11, its still bad, depends on Vin. Something else going on...
+Reason is the LMV324 common mode input range only extends down to 0V, not up to VCC. In fact the maximum for 5V is 4.2V typ which is about what we see fortunately. It gets more noticable at 3.3V where the limit appears to be more like 2.8V. This might be the reason for the odd behaviour of the comparator mode too. 
+Solution is to make sure to divide the anaout signal before the unity buffer, and make sure the desired anaout range is lower than the supplied VCC.
+To avoid this issue for the test results below, the anaout was scaled down 
+
+VCC 3.3V, gain=50k, 
+short = 2.00V
+open = 0.95V =48%
+capacitive 1 drop = 1.07=54%, 2 drops = 1.22=61%, 3 drops = 1.3=65%, big smear = 1.8
+5V smear = 2.00, open = 0.98
+
+
+VCC 3.3V, gain=100k,
+short = 2.06V
+open = 1.44V=72%
+capacitive 1 drop = 1.62=81%, 2 drops = 1.75=88%, 3 drops = 1.81, big smear = 1.96
+5V smear = 2.84, open = 1.54
